@@ -17,8 +17,8 @@ public class InputIngoActivity extends AppCompatActivity {
     EditText contact_name;
     EditText contact_no;
     Button save_button;
-    String name;
-    String number;
+    private String name;
+    private String number;
     public static final String CONTACT_NAME="contact_name";
     public static final String CONTACT_NUMBER="contact_number";
     @Override
@@ -51,16 +51,14 @@ public class InputIngoActivity extends AppCompatActivity {
     public void saveInfo() {
         name=contact_name.getText().toString();
         number=contact_no.getText().toString();
-        if(name.trim().isEmpty() || number.trim().isEmpty()) {
+        if(name.trim().isEmpty() || number.trim().isEmpty()){
             Toast.makeText(this, "Please Enter a name and number", Toast.LENGTH_SHORT).show();
             return;
         }
-
         Intent intent = new Intent(InputIngoActivity.this,MainActivity.class);
         intent.putExtra(CONTACT_NAME,name);
         intent.putExtra(CONTACT_NUMBER,number);
         setResult(RESULT_OK,intent);
-
         finish();
 
     }

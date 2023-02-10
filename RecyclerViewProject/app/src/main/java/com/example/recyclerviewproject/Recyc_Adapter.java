@@ -1,5 +1,6 @@
 package com.example.recyclerviewproject;
 
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,10 @@ import java.util.List;
 public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
 
     private ArrayList<Contact> localData ;
-    public Recyc_Adapter(ArrayList<Contact> contacts){
-
-        localData=contacts;
+    SetOnClickListener listener;
+    public Recyc_Adapter(ArrayList<Contact> contacts,SetOnClickListener listener){
+        this.listener = listener;
+        this.localData=contacts;
     }
 
     @NonNull
@@ -36,6 +38,19 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
         holder.name_textView.setText(currentItem.getContact_name());
         holder.number_textView.setText(currentItem.getContact_no());
         holder.imageView.setImageResource(currentItem.getContact_img());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onClickItem(currentItem);
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                listener.onLongClickItem(currentItem);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -77,6 +92,15 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
             this.imageView = imageView;
         }
     }
+    public Contact getContact(int position){
+        return localData.get(position);
+    }
+
+    public interface SetOnClickListener{
+        public void onClickItem(Contact contact);
+        public void onLongClickItem(Contact contact);
+    }
+
 //    public void setContacts(List<Contact> contacts){
 //        localDataSet = contacts;
 //        notifyDataSetChanged();

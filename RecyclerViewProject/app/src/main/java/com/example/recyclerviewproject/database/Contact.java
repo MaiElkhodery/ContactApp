@@ -5,11 +5,18 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Contact {
-    private int contact_img;
     @PrimaryKey(autoGenerate = true)
     private long id;
+    private int contact_img;
     private String contact_no;
+    private String contact_name;
 
+
+    public Contact(int contact_img, String contact_name, String contact_no) {
+        this.contact_img = contact_img;
+        this.contact_no = contact_no;
+        this.contact_name = contact_name;
+    }
     public long getId() {
         return id;
     }
@@ -17,15 +24,6 @@ public class Contact {
     public void setId(long id) {
         this.id = id;
     }
-
-    private String contact_name;
-
-    public Contact(int contact_img, String contact_name, String contact_no) {
-        this.contact_img = contact_img;
-        this.contact_no = contact_no;
-        this.contact_name = contact_name;
-    }
-
     public int getContact_img() {
         return contact_img;
     }
