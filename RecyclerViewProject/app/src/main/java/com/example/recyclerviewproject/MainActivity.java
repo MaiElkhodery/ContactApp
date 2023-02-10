@@ -30,19 +30,22 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity  {
 
     private ContactViewModel viewModel;
+    ContactsDatabase database;
+    ArrayList<Contact> contactList;
     Recyc_Adapter adapter;
     RecyclerView recyclerView;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        contactList = new ArrayList<>();
         initRecyclerView();
-        initViewModel();
-
+        initDatabase();
+        showList();
+        //initViewModel();
 
         FloatingActionButton add_button = findViewById(R.id.addButton);
         add_button.setOnClickListener(new View.OnClickListener() {
@@ -56,20 +59,23 @@ public class MainActivity extends AppCompatActivity  {
     }
     public void initRecyclerView(){
         recyclerView = findViewById(R.id.recyclerview);
-        adapter = new Recyc_Adapter();
+        adapter = new Recyc_Adapter(contactList);
         recyclerView.setAdapter(adapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
     }
-    public void initViewModel(){
-        viewModel = new ViewModelProvider(this).get(ContactViewModel.class);
-        viewModel.getAll().observe(this, new Observer<List<Contact>>() {
-            @Override
-            public void onChanged(List<Contact> contacts) {
-                adapter.setContacts(contacts);
-                Log.d("observer","done");
-            }
-        });
+//    public void initViewModel(){
+//        viewModel = new ViewModelProvider(this).get(ContactViewModel.class);
+//        viewModel.getAll().observe(this, new Observer<List<Contact>>() {
+//            @Override
+//            public void onChanged(List<Contact> contacts) {
+//                //adapter.setContacts(contacts);
+//                Log.d("observer","done");
+//            }
+//        });
+//    }
+    public void initDatabase(){
+        database=ContactsDatabase.getINSTANCE(this);
     }
 
     @Override
@@ -77,12 +83,25 @@ public class MainActivity extends AppCompatActivity  {
         super.onActivityResult(requestCode, resultCode, data);
         insertData();
     }
+    public void showList(){
+        database.contactDAO().retrieveAllContacts().observe(this, new Observer<List<Contact>>() {
+            @Override
+            public void onChanged(List<Contact> contacts) {
+               contactList.clear();
+               contactList.addAll(contacts);
+               adapter.notifyDataSetChanged();
+                Log.d("observer","done");
+            }
+        });
+    }
 
     public void insertData() {
         Intent get_intent=getIntent();
         String name = get_intent.getStringExtra(InputIngoActivity.CONTACT_NAME);
         String number = get_intent.getStringExtra(InputIngoActivity.CONTACT_NUMBER);
-        viewModel.insert(new Contact(R.drawable.mmm, name, number));
+        database.contactDAO().insertContact(new Contact(R.drawable.mmm, name, number));
+        adapter.notifyDataSetChanged();
+        //viewModel.insert(new Contact(R.drawable.mmm, name, number));
     }
 
 }

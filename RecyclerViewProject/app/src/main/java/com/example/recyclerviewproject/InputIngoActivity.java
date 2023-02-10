@@ -59,7 +59,7 @@ public class InputIngoActivity extends AppCompatActivity {
         Intent intent = new Intent(InputIngoActivity.this,MainActivity.class);
         intent.putExtra(CONTACT_NAME,name);
         intent.putExtra(CONTACT_NUMBER,number);
-        startActivity(intent);
+        setResult(RESULT_OK,intent);
 
         finish();
 

@@ -17,7 +17,11 @@ import java.util.List;
 
 public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
 
-    private List<Contact> localDataSet = new ArrayList<>();
+    private ArrayList<Contact> localData ;
+    public Recyc_Adapter(ArrayList<Contact> contacts){
+
+        localData=contacts;
+    }
 
     @NonNull
     @Override
@@ -28,7 +32,7 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
-        Contact currentItem = localDataSet.get(position);
+        Contact currentItem = localData.get(position);
         holder.name_textView.setText(currentItem.getContact_name());
         holder.number_textView.setText(currentItem.getContact_no());
         holder.imageView.setImageResource(currentItem.getContact_img());
@@ -36,7 +40,7 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
 
     @Override
     public int getItemCount() {
-        return localDataSet.size();
+        return localData.size();
     }
 
     public static class Holder extends RecyclerView.ViewHolder{
@@ -73,9 +77,9 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
             this.imageView = imageView;
         }
     }
-    public void setContacts(List<Contact> contacts){
-        localDataSet = contacts;
-        notifyDataSetChanged();
-        Log.d("setContacts","set contacts is done");
-    }
+//    public void setContacts(List<Contact> contacts){
+//        localDataSet = contacts;
+//        notifyDataSetChanged();
+//        Log.d("setContacts","set contacts is done");
+//    }
 }
