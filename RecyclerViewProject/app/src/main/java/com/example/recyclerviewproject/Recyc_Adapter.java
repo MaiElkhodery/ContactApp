@@ -1,5 +1,6 @@
 package com.example.recyclerviewproject;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.recyclerviewproject.database.Contact;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
 
-    private ArrayList<Contact> localDataSet;
+    private List<Contact> localDataSet = new ArrayList<>();
 
-    public Recyc_Adapter(ArrayList<Contact> localDataSet){
-        this.localDataSet = localDataSet;
-    }
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,5 +72,10 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
         public void setImageView(ImageView imageView) {
             this.imageView = imageView;
         }
+    }
+    public void setContacts(List<Contact> contacts){
+        localDataSet = contacts;
+        notifyDataSetChanged();
+        Log.d("setContacts","set contacts is done");
     }
 }
