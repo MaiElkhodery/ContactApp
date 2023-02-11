@@ -27,6 +27,8 @@ public class InputIngoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input_ingo);
 
+        getSupportActionBar().setTitle("Enter Contact");
+
         contact_name=findViewById(R.id.editTextPersonName);
 
         contact_no=findViewById(R.id.editTextPhone);

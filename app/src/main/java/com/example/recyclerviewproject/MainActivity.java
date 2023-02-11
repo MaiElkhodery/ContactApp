@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -72,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setTitle("Contacts");
 
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
         contactList = new ArrayList<>();
