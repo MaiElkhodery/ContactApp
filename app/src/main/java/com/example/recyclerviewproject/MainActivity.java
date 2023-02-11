@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
 
     String contact_name;
     String contact_number;
+    FloatingActionButton add_button;
+    AppCompatImageButton next_button;
+    ContactDetailsFragment contactFragment;
     private ContactViewModel viewModel;
     ContactsDatabase database;
     ArrayList<Contact> contactList;
@@ -78,12 +82,17 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
 
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
         contactList = new ArrayList<>();
-        contactList.add(new Contact(R.drawable.boo2,"Mai","028"));
-        contactList.add(new Contact(R.drawable.boo2,"donia","00000"));
         initRecyclerView();
         initDatabase();
+        setOnClickAddButton();
         showList();
-        FloatingActionButton add_button = findViewById(R.id.addButton);
+        deleteItem();
+        itemsDragDrop();
+
+    }
+
+    public void setOnClickAddButton(){
+        add_button = findViewById(R.id.addButton);
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
                 activityLauncher.launch(intent);
             }
         });
-        deleteItem();
-        itemsDragDrop();
-
     }
 
     public void initRecyclerView(){
@@ -150,6 +156,14 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     }
 
     //make sound methods..implementing the interface
+    public void setOnClickNextButton(Contact contact){
+        getSupportActionBar().hide();
+        add_button.hide();
+        contactFragment = ContactDetailsFragment.newInstance(R.drawable.mmm,contact.getContact_name()
+                ,contact.getContact_no());
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,contactFragment)
+                .commit();
+    }
     @Override
     public void onClickItem(Contact contact) {
         playClickAudio();

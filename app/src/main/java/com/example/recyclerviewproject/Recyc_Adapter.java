@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.recyclerviewproject.database.Contact;
@@ -52,6 +53,12 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
                 return false;
             }
         });
+        holder.next_imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.setOnClickNextButton(currentItem);
+            }
+        });
     }
 
     @Override
@@ -63,11 +70,13 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
         private TextView name_textView;
         private TextView number_textView;
         private ImageView imageView;
+        private AppCompatImageButton next_imageView;
         public Holder(View view){
             super(view);
             name_textView = view.findViewById(R.id.name_textView);
             number_textView = view.findViewById(R.id.number_textView);
             imageView = view.findViewById(R.id.imageView);
+            next_imageView=view.findViewById(R.id.next_button);
         }
         public TextView getTextView(){
             return name_textView;
@@ -100,5 +109,6 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
     public interface SetOnClickListener{
         public void onClickItem(Contact contact);
         public void onLongClickItem(Contact contact);
+        public void setOnClickNextButton(Contact contact);
     }
 }

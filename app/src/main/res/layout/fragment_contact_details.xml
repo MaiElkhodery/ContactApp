@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ContactDetailsFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <ImageView
+        android:id="@+id/contact_img_imageView"
+        android:layout_width="426dp"
+        android:layout_height="310dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/boo2"
+        tools:layout_editor_absoluteX="80dp"
+        tools:layout_editor_absoluteY="45dp" />
+
+    <TextView
+        android:id="@+id/contact_name_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:layout_marginTop="28dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/black"/>
+    <TextView
+        android:id="@+id/contact_number_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Number"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/black"/>
+
+</LinearLayout>
