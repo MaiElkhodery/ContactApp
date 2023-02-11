@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     CoordinatorLayout coordinatorLayout;
     ItemTouchHelper itemTouchHelper;
     public static final int ADD_CONTACT_REQUEST =1;
+    ItemTouchHelper.SimpleCallback callback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
         contactList.add(new Contact(R.drawable.boo2,"donia","00000"));
         initRecyclerView();
         initDatabase();
-        showList();
+        insertData();
         FloatingActionButton add_button = findViewById(R.id.addButton);
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,10 +70,9 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
                 startActivityForResult(intent,ADD_CONTACT_REQUEST);
             }
         });
+
         deleteItem();
-        //itemsDragDrop();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        itemsDragDrop();
 
     }
 
@@ -83,16 +83,7 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
     }
-//    public void initViewModel(){
-//        viewModel = new ViewModelProvider(this).get(ContactViewModel.class);
-//        viewModel.getAll().observe(this, new Observer<List<Contact>>() {
-//            @Override
-//            public void onChanged(List<Contact> contacts) {
-//                //adapter.setContacts(contacts);
-//                Log.d("observer","done");
-//            }
-//        });
-//    }
+
     public void initDatabase(){
         database=ContactsDatabase.getINSTANCE(this);
     }
@@ -188,18 +179,20 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
                 Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-    //Drag and drop items in recyclerview
 
-         ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
-                ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END,0){
+    //Drag and drop items in recyclerview
+    private void itemsDragDrop() {
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
+                ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 int fromPosition = viewHolder.getAdapterPosition();
                 int toPosition = target.getAdapterPosition();
 
-                Collections.swap(contactList,fromPosition,toPosition);
-                adapter.notifyItemMoved(fromPosition,toPosition);
+                Collections.swap(contactList, fromPosition, toPosition);
+                adapter.notifyItemMoved(fromPosition, toPosition);
                 return false;
             }
 
@@ -207,7 +200,19 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
             }
-        };
+        });
+    }
 
+
+//        public void initViewModel(){
+//        viewModel = new ViewModelProvider(this).get(ContactViewModel.class);
+//        viewModel.getAll().observe(this, new Observer<List<Contact>>() {
+//            @Override
+//            public void onChanged(List<Contact> contacts) {
+//                //adapter.setContacts(contacts);
+//                Log.d("observer","done");
+//            }
+//        });
+//    }
 
 }

@@ -15,13 +15,14 @@ import com.example.recyclerviewproject.database.Contact;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
 
     private ArrayList<Contact> localData ;
     SetOnClickListener listener;
     public Recyc_Adapter(ArrayList<Contact> contacts,SetOnClickListener listener){
-        this.listener = listener;
+        this.listener = (SetOnClickListener) listener;
         this.localData=contacts;
     }
 
