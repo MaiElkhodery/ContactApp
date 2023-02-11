@@ -101,10 +101,4 @@ public class Recyc_Adapter extends RecyclerView.Adapter<Recyc_Adapter.Holder> {
         public void onClickItem(Contact contact);
         public void onLongClickItem(Contact contact);
     }
-
-//    public void setContacts(List<Contact> contacts){
-//        localDataSet = contacts;
-//        notifyDataSetChanged();
-//        Log.d("setContacts","set contacts is done");
-//    }
 }

@@ -1,5 +1,9 @@
 package com.example.recyclerviewproject;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -37,6 +42,8 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements Recyc_Adapter.SetOnClickListener {
 
+    String contact_name;
+    String contact_number;
     private ContactViewModel viewModel;
     ContactsDatabase database;
     ArrayList<Contact> contactList;
@@ -47,8 +54,19 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     Snackbar snackbar;
     CoordinatorLayout coordinatorLayout;
     ItemTouchHelper itemTouchHelper;
-    public static final int ADD_CONTACT_REQUEST =1;
     ItemTouchHelper.SimpleCallback callback;
+    ActivityResultLauncher<Intent> activityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == RESULT_OK) {
+                        contact_name = result.getData().getStringExtra(InputIngoActivity.CONTACT_NAME);
+                        contact_number = result.getData().getStringExtra(InputIngoActivity.CONTACT_NUMBER);
+                        insertData();
+                        Toast.makeText(getApplicationContext(), "Contact insertion is done", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +79,15 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
         contactList.add(new Contact(R.drawable.boo2,"donia","00000"));
         initRecyclerView();
         initDatabase();
-        insertData();
+        showList();
         FloatingActionButton add_button = findViewById(R.id.addButton);
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,InputIngoActivity.class);
-                startActivityForResult(intent,ADD_CONTACT_REQUEST);
+                activityLauncher.launch(intent);
             }
         });
-
         deleteItem();
         itemsDragDrop();
 
@@ -88,15 +105,6 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
         database=ContactsDatabase.getINSTANCE(this);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == ADD_CONTACT_REQUEST && resultCode == RESULT_OK){
-            insertData();
-            Toast.makeText(this,"insertion done",Toast.LENGTH_SHORT).show();
-        }
-
-    }
     public void showList(){
         database.contactDAO().retrieveAllContacts().observe(this, new Observer<List<Contact>>() {
             @Override
@@ -104,18 +112,15 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
                contactList.clear();
                contactList.addAll(contacts);
                adapter.notifyDataSetChanged();
-                Log.d("getContacts","Contact database size = "+contactList.size());
             }
         });
     }
 
     public void insertData() {
-        String name = getIntent().getStringExtra(InputIngoActivity.CONTACT_NAME);
-        String number = getIntent().getStringExtra(InputIngoActivity.CONTACT_NUMBER);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                database.contactDAO().insertContact(new Contact(R.drawable.mmm, name, number));
+                database.contactDAO().insertContact(new Contact(R.drawable.mmm, contact_name, contact_number));
             }
         });
         showList();
@@ -154,17 +159,18 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     }
 
     public void playClickAudio(){
-        audio = MediaPlayer.create(this,R.raw.short_click);
+        audio = MediaPlayer.create(getApplicationContext(),R.raw.short_click);
         audio.start();
         audio.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 audio.release();
+                Log.d("audio","released");
             }
         });
     }
     public void playLongClickAudio(){
-        audio = MediaPlayer.create(this,R.raw.long_click);
+        audio = MediaPlayer.create(getApplicationContext(),R.raw.long_click);
         audio.start();
         audio.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -183,8 +189,8 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     //Drag and drop items in recyclerview
     private void itemsDragDrop() {
 
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
-                ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END, 0) {
+        callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
+                ItemTouchHelper.DOWN , 0) {
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -200,7 +206,9 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
             }
-        });
+        };
+         itemTouchHelper = new ItemTouchHelper(callback);
+         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
 
