@@ -1,6 +1,7 @@
 package com.example.recyclerviewproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ public class InputIngoActivity extends AppCompatActivity {
 
     EditText contact_name;
     EditText contact_no;
-    Button save_button;
+    AppCompatButton save_button;
     private String name;
     private String number;
     public static final String CONTACT_NAME="contact_name";
@@ -25,6 +26,8 @@ public class InputIngoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input_ingo);
+
+        getSupportActionBar().setTitle("Enter Contact");
 
         contact_name=findViewById(R.id.editTextPersonName);
 

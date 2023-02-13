@@ -6,13 +6,27 @@
     android:layout_height="match_parent"
     tools:context=".InputIngoActivity">
 
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Enter Contact Data"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/editTextPersonName"
-        android:layout_width="206dp"
+        android:layout_width="match_parent"
         android:layout_height="41dp"
-        android:layout_marginStart="28dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="177dp"
+        android:layout_marginEnd="5dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
@@ -22,11 +36,11 @@
 
     <EditText
         android:id="@+id/editTextPhone"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="173dp"
+        android:layout_marginEnd="5dp"
         android:ems="10"
         android:hint="Phone Number"
         android:inputType="phone"
@@ -34,26 +48,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPersonName" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginEnd="214dp"
-        android:text="Enter Contact Data"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="23dp"
+        android:layout_marginTop="36dp"
         android:text="Save"
+        android:backgroundTint="#9C8B7D"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
 

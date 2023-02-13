@@ -1,9 +1,14 @@
 package com.example.recyclerviewproject;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -37,6 +44,11 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements Recyc_Adapter.SetOnClickListener {
 
+    String contact_name;
+    String contact_number;
+    FloatingActionButton add_button;
+    AppCompatImageButton next_button;
+    ContactDetailsFragment contactFragment;
     private ContactViewModel viewModel;
     ContactsDatabase database;
     ArrayList<Contact> contactList;
@@ -47,33 +59,47 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     Snackbar snackbar;
     CoordinatorLayout coordinatorLayout;
     ItemTouchHelper itemTouchHelper;
-    public static final int ADD_CONTACT_REQUEST =1;
+    ItemTouchHelper.SimpleCallback callback;
+    ActivityResultLauncher<Intent> activityLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode() == RESULT_OK) {
+                        contact_name = result.getData().getStringExtra(InputIngoActivity.CONTACT_NAME);
+                        contact_number = result.getData().getStringExtra(InputIngoActivity.CONTACT_NUMBER);
+                        insertData();
+                        Toast.makeText(getApplicationContext(), "Contact insertion is done", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setTitle("Contacts");
+
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
         contactList = new ArrayList<>();
-        contactList.add(new Contact(R.drawable.boo2,"Mai","028"));
-        contactList.add(new Contact(R.drawable.boo2,"donia","00000"));
         initRecyclerView();
         initDatabase();
+        setOnClickAddButton();
         showList();
-        FloatingActionButton add_button = findViewById(R.id.addButton);
+        deleteItem();
+        itemsDragDrop();
+
+    }
+
+    public void setOnClickAddButton(){
+        add_button = findViewById(R.id.addButton);
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this,InputIngoActivity.class);
-                startActivityForResult(intent,ADD_CONTACT_REQUEST);
+                activityLauncher.launch(intent);
             }
         });
-        deleteItem();
-        //itemsDragDrop();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-
     }
 
     public void initRecyclerView(){
@@ -83,29 +109,11 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
     }
-//    public void initViewModel(){
-//        viewModel = new ViewModelProvider(this).get(ContactViewModel.class);
-//        viewModel.getAll().observe(this, new Observer<List<Contact>>() {
-//            @Override
-//            public void onChanged(List<Contact> contacts) {
-//                //adapter.setContacts(contacts);
-//                Log.d("observer","done");
-//            }
-//        });
-//    }
+
     public void initDatabase(){
         database=ContactsDatabase.getINSTANCE(this);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == ADD_CONTACT_REQUEST && resultCode == RESULT_OK){
-            insertData();
-            Toast.makeText(this,"insertion done",Toast.LENGTH_SHORT).show();
-        }
-
-    }
     public void showList(){
         database.contactDAO().retrieveAllContacts().observe(this, new Observer<List<Contact>>() {
             @Override
@@ -113,18 +121,15 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
                contactList.clear();
                contactList.addAll(contacts);
                adapter.notifyDataSetChanged();
-                Log.d("getContacts","Contact database size = "+contactList.size());
             }
         });
     }
 
     public void insertData() {
-        String name = getIntent().getStringExtra(InputIngoActivity.CONTACT_NAME);
-        String number = getIntent().getStringExtra(InputIngoActivity.CONTACT_NUMBER);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                database.contactDAO().insertContact(new Contact(R.drawable.mmm, name, number));
+                database.contactDAO().insertContact(new Contact(R.drawable.mmm, contact_name, contact_number));
             }
         });
         showList();
@@ -149,8 +154,44 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
             }
         }).attachToRecyclerView(recyclerView);
     }
+    //Drag and drop items in recyclerview
+    private void itemsDragDrop() {
+
+        callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
+                ItemTouchHelper.DOWN , 0) {
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+
+                Collections.swap(contactList, fromPosition, toPosition);
+                adapter.notifyItemMoved(fromPosition, toPosition);
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+        };
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
 
     //make sound methods..implementing the interface
+    public void setOnClickNextButton(Contact contact){
+
+        add_button.hide();
+        contactFragment = ContactDetailsFragment.newInstance(R.drawable.mmm,contact.getContact_name()
+                ,contact.getContact_no());
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,contactFragment)
+                .commit();
+
+    }
+    public void setOnClickCallButton(Contact contact){
+      
+    }
     @Override
     public void onClickItem(Contact contact) {
         playClickAudio();
@@ -163,17 +204,18 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
     }
 
     public void playClickAudio(){
-        audio = MediaPlayer.create(this,R.raw.short_click);
+        audio = MediaPlayer.create(getApplicationContext(),R.raw.short_click);
         audio.start();
         audio.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 audio.release();
+                Log.d("audio","released");
             }
         });
     }
     public void playLongClickAudio(){
-        audio = MediaPlayer.create(this,R.raw.long_click);
+        audio = MediaPlayer.create(getApplicationContext(),R.raw.long_click);
         audio.start();
         audio.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -188,26 +230,19 @@ public class MainActivity extends AppCompatActivity implements Recyc_Adapter.Set
                 Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-    //Drag and drop items in recyclerview
 
-         ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP |
-                ItemTouchHelper.DOWN | ItemTouchHelper.START | ItemTouchHelper.END,0){
 
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                int fromPosition = viewHolder.getAdapterPosition();
-                int toPosition = target.getAdapterPosition();
 
-                Collections.swap(contactList,fromPosition,toPosition);
-                adapter.notifyItemMoved(fromPosition,toPosition);
-                return false;
-            }
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
-            }
-        };
-
+//        public void initViewModel(){
+//        viewModel = new ViewModelProvider(this).get(ContactViewModel.class);
+//        viewModel.getAll().observe(this, new Observer<List<Contact>>() {
+//            @Override
+//            public void onChanged(List<Contact> contacts) {
+//                //adapter.setContacts(contacts);
+//                Log.d("observer","done");
+//            }
+//        });
+//    }
 
 }
